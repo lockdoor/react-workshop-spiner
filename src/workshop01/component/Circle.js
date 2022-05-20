@@ -49,7 +49,7 @@ const Circle = ({choices, spin, duration, fixChoice}) => {
   }, [spin, duration])
   
   return (
-    <div 
+    <div
       style={{
         position: 'relative',
         width: 320,
