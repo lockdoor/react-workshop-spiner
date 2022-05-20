@@ -1,0 +1,18 @@
+.spin{
+  animation-fill-mode: forwards;
+  animation-duration: var(--duration);
+  animation-name: spin;
+  /* transform: rotate(var(--to-degree)); */
+}
+/* .un-spin{
+  animation-fill-mode: forwards;
+  transform: rotate(var(--to-degree));
+} */
+@keyframes spin{
+  /* from{
+    transform: rotate(0deg);
+  } */
+  to{
+    transform: rotate(var(--to-degree));
+  }
+}
