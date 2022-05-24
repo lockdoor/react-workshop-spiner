@@ -1,8 +1,10 @@
-const SelectChoice = ({choices, selectChoiceChangeHandle}) => {
+const SelectChoice = ({choices, selectChoiceChangeHandle, disabled}) => {
   
   return (
+    <label> Select Winner: 
     <select
       onChange={(e) => selectChoiceChangeHandle(e)}
+      disabled={disabled}
       style={{
         marginBottom: 20
       }}
@@ -16,6 +18,7 @@ const SelectChoice = ({choices, selectChoiceChangeHandle}) => {
         )
       })}
     </select>
+    </label>
   )
 }
 export default SelectChoice

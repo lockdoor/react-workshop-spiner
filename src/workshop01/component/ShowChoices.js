@@ -36,7 +36,7 @@ const ShowChoices = ({choices, removeChoice, spin}) => {
               style={{
                 flex: 1
               }}
-                onClick={()=>removeChoice(choice.id)}
+                onClick={(e)=>removeChoice(e, choice.name)}
               >
                 <MdDeleteForever size={20} color={'red'}/>
               </button>

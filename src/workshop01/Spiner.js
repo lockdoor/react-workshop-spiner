@@ -3,6 +3,7 @@ import ShowChoices from "./component/ShowChoices"
 import FormInputChoice from "./component/FromInputChoice"
 import Circle from "./component/Circle"
 import SelectChoice from "./component/SelectChoice"
+import UnSelectChoice from "./component/UnSelectChoice"
 import {FaArrowDown} from "react-icons/fa"
 import {ImSpinner10} from "react-icons/im"
 import {MdAutorenew} from "react-icons/md"
@@ -18,46 +19,99 @@ const randomColor = () => Math.floor(100+ Math.random() * 150)
 //   color: `rgb(${randomColor()}, ${randomColor()}, ${randomColor()})`},              
 //   {id: 4, name: 'เหลือง',
 //   color: `rgb(${randomColor()}, ${randomColor()}, ${randomColor()})`},              
-//   // {id: 5, name: 'ขาว'},              
 // ]
 
 const Spiner = () => {
   const [choices, setChoices] = useState([])
   const [spin, setSpin] = useState(false)
-  const [disabledBtn, setDisableBtn] = useState(false)
+  const [disabledSpinBtn, setDisableSpinBtn] = useState(false)
   const [duration, setDuration] = useState(0)
   const [fixChoice, setfixChoice] = useState(0)
+  const [unChooseChoice, setUnChooseChoice] = useState([])
   
-  const addChoice = (text) => {        
+  const addChoice = (text) => {
+    //หาชื่อซ้ำ
+    const isExist =  choices.filter(choice => choice.name === text)
+    if(isExist.length > 0){
+      alert("Choice is Exist")
+      return
+    }
+    //สร้าง object
     const lastId = choices.length === 0 ? 0 : choices[choices.length - 1].id
     const choice = {
       id: lastId + 1, 
       name: text,
       color: `rgb(${randomColor()}, ${randomColor()}, ${randomColor()})`
     }
-    setChoices(prev => [...prev, choice])
+    setChoices(prev => {
+      localStorage.setItem('data', JSON.stringify([...prev, choice]))
+      return [...prev, choice]})
   }
-  const removeChoice = (id) => {
-    setChoices(prev => prev.filter(choice => choice.id !== id))
+
+  const removeChoice = (e, name) => {
+    e.preventDefault()
+    // console.log('id is ', typeof(id))
+    setChoices(prev => {
+      const arr = prev.filter(choice => {
+        console.log(choice.name , name)
+        return choice.name !== name})
+      arr.forEach(((item, index) => arr[index].id = index + 1))
+      localStorage.setItem('data', JSON.stringify(arr))
+      return arr
+    })
   }
   
   const spinBtnClickHandle = () => {
     // console.log('spin')    
     setSpin(!spin)
-    setDisableBtn(true)
+    setDisableSpinBtn(true)
     setTimeout(()=>{
-      setDisableBtn(false)
+      setDisableSpinBtn(false)
     }, spin? 10 : (duration +3) * 1000)
   }
+
   const selectChoiceChangeHandle = (e) => {
-    console.log(e.target.value)
-    setfixChoice(e.target.value)
+    e.preventDefault()    
+    // console.log(e.target.value)
+    setfixChoice(parseInt(e.target.value))
+  }
+
+  const unSelectChoiceHandle = (e) => {
+    // e.preventDefault()
+    const num = parseInt(e.target.value)
+    if(e.target.checked){
+      if(unChooseChoice.length >= choices.length - 1){
+        alert('ต้องเหลือไว้ 1')
+        e.target.checked = false
+        return
+      }else{
+        setUnChooseChoice(prev => [...prev, num])
+      }
+
+    }else{
+      setUnChooseChoice(prev => prev.filter(item => item !== num))
+    }
+    // console.log(e.target.value, e.target.checked) 
+    // setUnChooseChoice(values)
+    // console.log(values)
   }
 
   useEffect(()=>{
     const duration = Math.floor(Math.random()*10) + 10
     setDuration(duration)
-  },[])  
+    const data = JSON.parse(localStorage.getItem('data'))
+    if(data){
+      setChoices(data)
+    }
+  },[])
+
+  useEffect(()=>{
+    setDisableSpinBtn(choices.length < 2  ? true : false)
+    // localStorage.setItem('data', JSON.stringify(choices))
+    // console.log(choices)
+  },[choices])
+  
+  // useEffect(()=>{console.log(unChooseChoice)},[unChooseChoice])
   
   return (    
       <div 
@@ -75,10 +129,11 @@ const Spiner = () => {
         <FaArrowDown size={50} style={{marginBottom: 5}}/>
         <Circle choices={choices} spin={spin} 
           duration={duration} fixChoice={fixChoice}
+          unChooseChoice={unChooseChoice}
         />
         <button 
           onClick={spinBtnClickHandle}
-          disabled={disabledBtn}
+          disabled={disabledSpinBtn}
           style={{
             width: '40%',
             padding: 10,
@@ -91,6 +146,7 @@ const Spiner = () => {
         : <span><ImSpinner10/> SPIN</span>}</button>
         <FormInputChoice 
           addChoice={addChoice}
+          disabled={spin}
           />
         <ShowChoices 
           choices={choices} 
@@ -100,7 +156,13 @@ const Spiner = () => {
         <SelectChoice 
           choices={choices}
           selectChoiceChangeHandle={selectChoiceChangeHandle}
+          disabled={spin}
         />
+        {fixChoice === 0 && <UnSelectChoice 
+          choices={choices}
+          disabled={spin}
+          unSelectChoiceHandle={unSelectChoiceHandle}
+          />}
       </div> 
     
        

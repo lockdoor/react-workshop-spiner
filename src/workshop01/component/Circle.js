@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import './Circle.css';
-const Circle = ({choices, spin, duration, fixChoice}) => {
+const Circle = ({choices, spin, duration, fixChoice, unChooseChoice}) => {
   const [showFinish, setShowfinish] = useState(false)
   const [fixDegree, setFixDegree] =  useState(0)
   const [winner, setWinner] = useState(0)
   const [angle, setAngle] = useState(0)
 
-  const toDegree = 3600 - fixDegree
-  document.documentElement.style.setProperty('--to-degree', `${toDegree}deg`)
+  const toDegree = 3600 
+  document.documentElement.style.setProperty('--to-degree', `${toDegree - fixDegree}deg`)
   document.documentElement.style.setProperty('--duration', `${duration}s`)
 
   useEffect(()=>{
@@ -16,23 +16,42 @@ const Circle = ({choices, spin, duration, fixChoice}) => {
 
   useEffect(()=>{
     const randomNum = Math.random()
-    // console.log(randomNum)
-    const fix = Math.floor(randomNum*360)
+    
+    const fix = Math.floor(randomNum*360) //พิกัดองศาที่จบ
+
+    const choose = choices.filter(el=>!unChooseChoice.includes(el.id)) // กรณีมีการเลือกให้ไม่ชนะ
+
+
+    //เป็นค่าองศาที่จะไม่เท่ากันทำให้ศรไม่ลงตรงกลางช่อง จะลงสุ่มพิกัดในช่อง
     setFixDegree(()=>{
       if(fixChoice === 0){
-        return fix
+        if(unChooseChoice.length > 0){
+          return (angle * choose[Math.floor(randomNum*choose.length)].id) - Math.floor(randomNum*angle)
+        } else {
+          return fix 
+        }
       }else{
         return (angle * fixChoice) - Math.floor(randomNum*angle)
       }
     })
+
+    // เป็นค่า index ของ winner
     setWinner(()=>{
       if(fixChoice !== 0){
+        //ต้องลบออก 1 เพื่อทำให้เป็น index
         return fixChoice -1
       }else{
-        return Math.floor(fix / angle)
+        if(unChooseChoice.length > 0){
+          //หา winner ที่ไม่ได้เลือก
+          // console.log(choose)
+          return choose[Math.floor(randomNum*choose.length)].id - 1
+        }else{
+          // console.log(fix, angle, fix/angle)
+          return Math.floor(fix / angle)
+        }
       }
     })
-  },[spin, angle, fixChoice])
+  },[spin, angle, fixChoice, unChooseChoice, choices])
 
   useEffect(()=>{
     const circleSpin = () => {
@@ -57,7 +76,7 @@ const Circle = ({choices, spin, duration, fixChoice}) => {
         overflow: 'hidden',
         borderRadius: '50%',
         // border: '1px solid black',
-        marginBottom: 30,
+        marginBottom: '30px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -95,6 +114,7 @@ const Circle = ({choices, spin, duration, fixChoice}) => {
           listStyle: 'none',
           overflow: 'hidden',
           display: 'flex',
+          flexDirection: choices.length === 2 ? 'row-reverse' : 'row'
       }}
     >
     {
@@ -120,9 +140,7 @@ const Circle = ({choices, spin, duration, fixChoice}) => {
       })
     }
   </ul>
-      }
-      
-      
+      }       
     </div>    
   )
 }
@@ -177,6 +195,7 @@ const listStyle1 = (index, angle, choice) =>{
     display: 'flex',
     alignItems: "center",
     justifyContent: "center",
+    // flexDirection: 'row-reverse'
   }
 }
 
