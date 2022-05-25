@@ -1,6 +1,6 @@
 // import logo from './logo.svg';
 // import './App.css';
-import Spiner from "./workshop01/Spiner";
+import Spiner from "./spiner-app/Spiner";
 function App() {
   return (
     <Spiner />
