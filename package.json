@@ -1,6 +1,6 @@
 {
-  "name": "react-workshop",
-  "homepage": "http://jsworkshop.namning.xyz/react/",
+  "name": "react-workshop-spiner",
+  "homepage": "http://jsworkshop.namning.xyz/react01/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
